@@ -3,72 +3,70 @@ pragma solidity ^0.8.0;
 
 library Structs {
     struct Vote {
-        uint256 value;
-        uint256 weight;
+        uint32 epoch;
+        uint48[] values;
     }
 
+    struct Commitment {
+        uint32 epoch;
+        bytes32 commitmentHash;
+    }
     struct Staker {
-        uint256 id;
-        address _address;
-        uint256 stake;
-        uint256 age;
-        uint256 epochStaked;
-        uint256 epochLastCommitted;
-        uint256 epochLastRevealed;
         bool acceptDelegation;
-        uint256 commission;
+        uint8 commission;
+        address _address;
         address tokenAddress;
+        uint32 id;
+        uint32 age;
+        uint32 epochFirstStakedOrLastPenalized;
+        uint256 stake;
     }
 
     struct Lock {
-        uint256 amount; //amount in sTokens
+        uint256 amount; //amount in RZR
+        uint256 commission;
         uint256 withdrawAfter;
     }
 
+    struct BountyLock {
+        address bountyHunter;
+        uint256 amount; //amount in RZR
+        uint256 redeemAfter;
+    }
+
     struct Block {
-        uint256 proposerId;
-        uint256[] ids;
-        uint256[] medians;
+        uint32 proposerId;
+        uint32[] medians;
         uint256 iteration;
         uint256 biggestInfluence;
         bool valid;
     }
 
     struct Dispute {
+        uint8 assetId;
+        uint32 lastVisitedStaker;
         uint256 accWeight;
-        uint256 median;
-        uint256 lastVisited;
-        uint256 assetId;
+        uint256 accProd;
+        // uint32 median;
     }
 
     struct Job {
-        uint256 id;
-        uint256 epoch;
-        string url;
-        string selector;
+        uint8 id;
+        uint8 selectorType; // 0-1
+        uint8 weight; // 1-100
+        int8 power;
         string name;
-        bool repeat;
-        bool active;
-        address creator;
-        uint256 result;
-        uint256 assetType;
+        string selector;
+        string url;
     }
 
     struct Collection {
-        uint256 id;
-        string name;
-        uint32 aggregationMethod;
-        uint256[] jobIDs;
-        mapping(uint256 => bool) jobIDExist;
-        uint256 epoch;
         bool active;
-        address creator;
-        uint256 result;
-        uint256 assetType;
-    }
-
-    struct AssignedAsset {
-        uint256 id;
-        uint256 value;
+        uint8 id;
+        uint8 assetIndex;
+        int8 power;
+        uint32 aggregationMethod;
+        uint8[] jobIDs;
+        string name;
     }
 }

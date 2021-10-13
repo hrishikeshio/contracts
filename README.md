@@ -10,48 +10,53 @@ These are the contracts for Razor network.
 You'll need npm to install the required packages.
 To install npm , go to this [link](https://www.npmjs.com/get-npm)
 
-#### jq 
-For Windows/Linux, Visit [here](https://stedolan.github.io/jq/download/)
+# Development
+Create a `.env` file from `.env.tpl` and set the environment variables accordingly.
+##### Running tests
+Run `npm run test`
 
-For Mac, use `brew install jq` or for the most recent version use `brew install --HEAD jq`. Visit [this](https://github.com/stedolan/jq/wiki/Installation) for more info.
+##### Test Coverage
+Run `npm run coverage`
+
+##### Test Lint
+Run `npm run lint`
+
+##### prettify code
+Run `npm run lint:sol:fix`
 
 # Deployment
 
-##### Local Deployment using ganache cli/gui
-1. Run Ganache CLI/GUI (You can modify port in `hardhat.config.js`)
-2. Provide provider host & port in `.env.ganache`
-3. Run command `deploy:ganache`
+##### Using Docker
+The easiest way to get a local hardhat instance with deployed contracts is to run a docker container.
+ `$ docker-compose up`
 
-##### Goerli Deployment using ganache cli/gui
-1. Create `.env.goerli` file (Refs - `.env.tpl`), provide `mnemonic` & `provider` for deployment.
-2. Run command `deploy:goerli`
+##### Local Deployment using hardhat
+1. Create a copy of local environment `.env.local` from `.env.tpl` and set the environment variables accordingly
+2. Run hardhat node (`npx hardhat node`)
+3. Run command `deploy:local`
+4. Use tenderly to track local transactions: https://github.com/Tenderly/tenderly-cli#export
 
-# Migration guide
-1. Run `npm run deploy:goerli`
-2. `cd ../cli && git add . && git commit -m 'redeploy' && git push`
-3. `cd ../synthetic-assets`
-4. Change the delegator address in `synthetic-assets/migrations/2_deploy.js`
-5. `truffle migrate --reset --network goerli`
-6. `git add . && git commit -m 'redeploy' && git push`
-7. `cd ../dashboard`
-8. `git add . && git commit -m 'redeploy' && git push`
-9. In remote server:
-   1. `cd cli && git pull`
-   2. `pm2 stop all`
-   3. Run first 5 lines in file cli/misc/deploy.sh for stakers to stake
-   4. `pm2 start all` once staked
+##### Polygon Mumbai Testnet Deployment
+1. Create a copy of local environment `.env.mumbai` from `.env.tpl` and set the environment variables accordingly
+2. Run command `deploy:mumbai`
 
-# Running tests
-Run `npm run test`
-
-# Test Coverage
-Run `npm run coverage`
-
-# Test Lint
-Run `npm run lint`
-
-# prettify code
-Run `npm run lint:sol:fix`
 
 # Addresses
-Deployed contract addresses can be found [here](deployed/goerli/addresses.json)
+We are currently live on Polygon Mumbai Testnet.
+
+Deployed contract addresses can be found [here](deployed/mumbai/addresses.json)
+
+# tenderly
+```
+npx hardhat node
+npm run deploy:local
+npm run deploy:mumbai
+npx hardhat test --network localhost          
+tenderly export  --export-network hardhat 0x4c30a90c6d2370abaef047fbac5a3f2dd43a9490caae7c79ec700eee600db024
+
+```
+
+# gas Prices across networks
+```
+npm run gas
+```

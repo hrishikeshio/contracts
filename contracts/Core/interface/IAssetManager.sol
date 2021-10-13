@@ -2,38 +2,15 @@
 pragma solidity ^0.8.0;
 
 interface IAssetManager {
-    function createJob(
-        string calldata url,
-        string calldata selector,
-        bool repeat
-    ) external;
+    function executePendingDeactivations(uint32 epoch) external;
 
-    function fulfillAsset(uint256 id, uint256 value) external;
+    function getActiveAssets() external view returns (uint8[] memory);
 
-    function getResult(uint256 id) external view returns (uint256);
+    function getPendingDeactivations() external view returns (uint8[] memory);
 
-    function getAssetType(uint256 id) external view returns (uint256);
+    function getAssetIndex(uint8 id) external view returns (uint8);
 
-    function getJob(uint256 id)
-        external
-        view
-        returns (
-            string memory url,
-            string memory selector,
-            string memory name,
-            bool repeat,
-            uint256 result
-        );
+    function getNumActiveAssets() external view returns (uint256);
 
-    function getCollection(uint256 id)
-        external
-        view
-        returns (
-            string memory name,
-            uint32 aggregationMethod,
-            uint256[] memory jobIDs,
-            uint256 result
-        );
-
-    function getNumAssets() external view returns (uint256);
+    function getCollectionPower(uint8 id) external view returns (int8);
 }

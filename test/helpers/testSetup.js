@@ -1,12 +1,15 @@
-const { BLOCK_REWARD } = require('./constants');
-
 const { BigNumber } = ethers;
 const initialSupply = (BigNumber.from(10).pow(BigNumber.from(27)));
-const setupContracts = async () => {
-  const Structs = await ethers.getContractFactory('Structs');
-  const structs = await Structs.deploy();
-  await structs.deployed();
+const {
+  BLOCK_CONFIRMER_ROLE,
+  STAKER_ACTIVITY_UPDATER_ROLE,
+  STAKE_MODIFIER_ROLE,
+  REWARD_MODIFIER_ROLE,
+  ASSET_CONFIRMER_ROLE,
+  DELEGATOR_MODIFIER_ROLE,
+} = require('./constants');
 
+const setupContracts = async () => {
   const Random = await ethers.getContractFactory('Random');
   const random = await Random.deploy();
   await random.deployed();
@@ -17,19 +20,20 @@ const setupContracts = async () => {
     },
   });
 
-  const Parameters = await ethers.getContractFactory('Parameters');
-  const Delegator = await ethers.getContractFactory('Delegator');
-  const Faucet = await ethers.getContractFactory('Faucet');
-  const AssetManager = await ethers.getContractFactory('AssetManager');
-  const RAZOR = await ethers.getContractFactory('RAZOR');
-  const StakeManager = await ethers.getContractFactory('StakeManager');
-  const RewardManager = await ethers.getContractFactory('RewardManager');
-
-  const VoteManager = await ethers.getContractFactory('VoteManager', {
+  const RandomNoManager = await ethers.getContractFactory('RandomNoManager', {
     libraries: {
       Random: random.address,
     },
   });
+
+  const Parameters = await ethers.getContractFactory('Parameters');
+  const Delegator = await ethers.getContractFactory('Delegator');
+  const AssetManager = await ethers.getContractFactory('AssetManager');
+  const RAZOR = await ethers.getContractFactory('RAZOR');
+  const StakeManager = await ethers.getContractFactory('StakeManager');
+  const RewardManager = await ethers.getContractFactory('RewardManager');
+  const VoteManager = await ethers.getContractFactory('VoteManager');
+  const StakedTokenFactory = await ethers.getContractFactory('StakedTokenFactory');
 
   const parameters = await Parameters.deploy();
   const blockManager = await BlockManager.deploy();
@@ -37,54 +41,58 @@ const setupContracts = async () => {
   const delegator = await Delegator.deploy();
   const assetManager = await AssetManager.deploy(parameters.address);
   const stakeManager = await StakeManager.deploy();
-  const rewardManager = await RewardManager.deploy(BLOCK_REWARD.toHexString());
+  const rewardManager = await RewardManager.deploy();
   const voteManager = await VoteManager.deploy();
   const razor = await RAZOR.deploy(initialSupply);
-  const faucet = await Faucet.deploy(razor.address);
+  const stakedTokenFactory = await StakedTokenFactory.deploy();
+  const randomNoManager = await RandomNoManager.deploy();
 
   await parameters.deployed();
   await blockManager.deployed();
   await delegator.deployed();
-  await faucet.deployed();
   await assetManager.deployed();
   await razor.deployed();
+  await stakedTokenFactory.deployed();
   await stakeManager.deployed();
   await rewardManager.deployed();
   await voteManager.deployed();
+  await randomNoManager.deployed();
 
   const initializeContracts = async () => [
-    blockManager.initialize(stakeManager.address, rewardManager.address, voteManager.address, assetManager.address, parameters.address),
-    voteManager.initialize(stakeManager.address, rewardManager.address, blockManager.address, parameters.address, assetManager.address),
-    stakeManager.initialize(razor.address, rewardManager.address, voteManager.address, parameters.address),
+    blockManager.initialize(stakeManager.address, rewardManager.address, voteManager.address, assetManager.address, parameters.address,
+      randomNoManager.address),
+    voteManager.initialize(stakeManager.address, rewardManager.address, blockManager.address, parameters.address),
+    stakeManager.initialize(razor.address, rewardManager.address, voteManager.address, parameters.address, stakedTokenFactory.address),
     rewardManager.initialize(stakeManager.address, voteManager.address, blockManager.address, parameters.address),
-
-    assetManager.grantRole(await parameters.getAssetConfirmerHash(), blockManager.address),
-    blockManager.grantRole(await parameters.getBlockConfirmerHash(), voteManager.address),
-    rewardManager.grantRole(await parameters.getRewardModifierHash(), blockManager.address),
-    rewardManager.grantRole(await parameters.getRewardModifierHash(), voteManager.address),
-    rewardManager.grantRole(await parameters.getRewardModifierHash(), stakeManager.address),
-    stakeManager.grantRole(await parameters.getStakerActivityUpdaterHash(), voteManager.address),
-    stakeManager.grantRole(await parameters.getStakeModifierHash(), rewardManager.address),
-    stakeManager.grantRole(await parameters.getStakeModifierHash(), blockManager.address),
-    stakeManager.grantRole(await parameters.getStakeModifierHash(), voteManager.address),
-
-    delegator.upgradeDelegate(assetManager.address),
+    delegator.updateAddress(assetManager.address, blockManager.address, parameters.address),
+    assetManager.upgradeDelegator(delegator.address),
+    randomNoManager.initialize(blockManager.address, parameters.address),
+    assetManager.grantRole(ASSET_CONFIRMER_ROLE, blockManager.address),
+    blockManager.grantRole(BLOCK_CONFIRMER_ROLE, voteManager.address),
+    delegator.grantRole(DELEGATOR_MODIFIER_ROLE, assetManager.address),
+    rewardManager.grantRole(REWARD_MODIFIER_ROLE, blockManager.address),
+    rewardManager.grantRole(REWARD_MODIFIER_ROLE, voteManager.address),
+    rewardManager.grantRole(REWARD_MODIFIER_ROLE, stakeManager.address),
+    stakeManager.grantRole(STAKER_ACTIVITY_UPDATER_ROLE, voteManager.address),
+    stakeManager.grantRole(STAKE_MODIFIER_ROLE, rewardManager.address),
+    stakeManager.grantRole(STAKE_MODIFIER_ROLE, blockManager.address),
+    stakeManager.grantRole(STAKE_MODIFIER_ROLE, voteManager.address),
   ];
 
   return {
     blockManager,
     parameters,
     delegator,
-    faucet,
     assetManager,
     random,
     razor,
     stakeManager,
     rewardManager,
-    structs,
     voteManager,
     initializeContracts,
     stakedToken,
+    stakedTokenFactory,
+    randomNoManager,
   };
 };
 

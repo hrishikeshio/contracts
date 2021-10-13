@@ -4,31 +4,17 @@ pragma solidity ^0.8.0;
 import "../../lib/Structs.sol";
 
 interface IVoteManager {
-    function commit(uint256 epoch, bytes32 commitment) external;
+    function getVoteValue(uint8 assetId, uint32 stakerId) external view returns (uint48);
 
-    function reveal(
-        uint256 epoch,
-        bytes32 root,
-        uint256[] calldata assetIds,
-        uint256[] calldata values,
-        bytes32[][] calldata proofs,
-        bytes32 secret,
-        address stakerAddress
-    ) external;
+    function getVote(uint32 stakerId) external view returns (Structs.Vote memory vote);
 
-    function getCommitment(uint256 epoch, uint256 stakerId) external view returns (bytes32);
+    function getInfluenceSnapshot(uint32 epoch, uint32 stakerId) external view returns (uint256);
 
-    function getVote(
-        uint256 epoch,
-        uint256 stakerId,
-        uint256 assetId
-    ) external view returns (Structs.Vote memory vote);
+    function getTotalInfluenceRevealed(uint32 epoch) external view returns (uint256);
 
-    function getVoteWeight(
-        uint256 epoch,
-        uint256 assetId,
-        uint256 voteValue
-    ) external view returns (uint256);
+    function getEpochLastRevealed(uint32 stakerId) external view returns (uint32);
 
-    function getTotalInfluenceRevealed(uint256 epoch, uint256 assetId) external view returns (uint256);
+    function getEpochLastCommitted(uint32 stakerId) external view returns (uint32);
+
+    function getRandaoHash() external view returns (bytes32);
 }

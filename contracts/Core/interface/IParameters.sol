@@ -2,65 +2,47 @@
 pragma solidity ^0.8.0;
 
 interface IParameters {
-    function commit() external view returns (uint32);
+    function getEpoch() external view returns (uint32);
 
-    function reveal() external view returns (uint32);
+    function getState() external view returns (uint8);
 
-    function propose() external view returns (uint32);
+    function getAllSlashParams()
+        external
+        view
+        returns (
+            uint16,
+            uint16,
+            uint16,
+            uint16
+        );
 
-    function dispute() external view returns (uint32);
-
-    function burnAddress() external view returns (address);
-
-    function penaltyNotRevealNum() external view returns (uint256);
-
-    function penaltyNotRevealDenom() external view returns (uint256);
-
-    function resetLockPenalty() external view returns (uint256);
+    function epochLength() external view returns (uint16);
 
     function minStake() external view returns (uint256);
 
-    function withdrawLockPeriod() external view returns (uint256);
+    function aggregationRange() external view returns (uint8);
 
-    function withdrawReleasePeriod() external view returns (uint256);
+    function maxAltBlocks() external view returns (uint8);
 
-    function maxAltBlocks() external view returns (uint256);
+    function blockReward() external view returns (uint256);
 
-    function epochLength() external view returns (uint256);
+    function penaltyNotRevealNum() external view returns (uint16);
 
-    function numStates() external view returns (uint256);
+    function baseDenominator() external view returns (uint16);
 
-    function gracePeriod() external view returns (uint256);
+    function maxCommission() external view returns (uint8);
 
-    function aggregationRange() external view returns (uint256);
+    function withdrawLockPeriod() external view returns (uint8);
 
-    function exposureDenominator() external view returns (uint256);
-
-    function slashPenaltyNum() external view returns (uint256);
-
-    function slashPenaltyDenom() external view returns (uint256);
-
-    function maxAssetsPerStaker() external view returns (uint256);
-
-    function getEpoch() external view returns (uint256);
-
-    function getState() external view returns (uint256);
-
-    function maxAge() external view returns (uint256);
+    function withdrawReleasePeriod() external view returns (uint8);
 
     function escapeHatchEnabled() external view returns (bool);
 
-    function getAssetConfirmerHash() external view returns (bytes32);
+    function gracePeriod() external view returns (uint16);
 
-    function getBlockConfirmerHash() external view returns (bytes32);
+    function maxAge() external view returns (uint32);
 
-    function getStakeModifierHash() external view returns (bytes32);
+    function exposureDenominator() external view returns (uint16);
 
-    function getStakerActivityUpdaterHash() external view returns (bytes32);
-
-    function getRewardModifierHash() external view returns (bytes32);
-
-    function getAssetModifierHash() external view returns (bytes32);
-
-    function getDefaultAdminHash() external view returns (bytes32);
+    function extendLockPenalty() external view returns (uint8);
 }
