@@ -223,6 +223,20 @@ contract BlockManager is Initializable, BlockStorage, StateManager, BlockManager
             blockIndexToBeConfirmed = 0;
             return;
         }
+        // Case 1 
+        // 2,1,3,4 (All are valid, and invalid 5 comes in)
+
+        // Case 2
+        // 2,1,3,4 (All are invalid, and valid 5 comes in)
+           
+        // 5,1,3,4
+        
+        // Algo
+        // Keep Track of biggestInfluenceStated this epoch 
+        // then if incoming block 
+        // > replace
+        // < discard
+        // = push
 
         for (uint8 i = 0; i < sortedProposedBlockslength; i++) {
             // Replace : New Block has better biggest influence

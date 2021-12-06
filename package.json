@@ -50,6 +50,7 @@
     "@nomiclabs/hardhat-etherscan": "^2.1.6",
     "@nomiclabs/hardhat-truffle5": "^2.0.0",
     "@nomiclabs/hardhat-web3": "^2.0.0",
+    "@razor-network/merkle": "^0.6.0",
     "@tenderly/hardhat-tenderly": "^1.0.12",
     "chai": "^4.3.4",
     "coveralls": "^3.1.1",
