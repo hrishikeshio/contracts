@@ -6,6 +6,16 @@ import "hardhat/console.sol";
  * @dev These functions deal with verification of Merkle trees (hash trees),
  */
 library MerkleProof {
+
+    function verifyMultiple(bytes32[][] memory proofs, bytes32 root, bytes32 [] memory leaves, uint32[] memory assetId, uint32 depth) internal view returns (bool) {
+         for (uint256 i =0; i< proofs.length; i++)
+         {
+             if(!verify(proofs[i], root, leaves[i], assetId[i], depth)) return false;
+             //console.log('passed for', i+1);
+         }
+         return true;
+    }
+    
     /**
      * @dev Returns true if a `leaf` can be proved to be a part of a Merkle tree
      * defined by `root`. For this, a `proof` must be provided, containing
@@ -15,13 +25,14 @@ library MerkleProof {
     function verify(bytes32[] memory proof, bytes32 root, bytes32 leaf, uint32 assetId, uint32 depth) internal view returns (bool) {
         bytes32 computedHash = leaf;
         bytes memory seq = bytes(getSequence(assetId, depth));
-        console.log(string(seq));
-        uint256 j = proof.length;
+        //console.log(string(seq));
+        uint256 j = depth;
         for (uint256 i = 0; i < proof.length; i++) {
             bytes32 proofElement = proof[i];
             //console.logBytes1(seq[depth - i - 1]);
+            //console.logBytes32(proofElement);
             j--;
-            if(seq.length > j) {
+            if(proofElement != 0x0) {
                 if (seq[j] == 0x30) {
                     //console.log('Hash(current computed hash + current element of the proof)');
                     computedHash = keccak256(abi.encodePacked(computedHash, proofElement));
@@ -95,7 +106,38 @@ library MerkleProof {
 //  001
 //  010
 //  011
-//  1
+//  100
 
 
   
+
+//           0
+//       0               
+//    0      0       0     
+//  0  0   0   0    0  0    
+// 000 001 010 011  100 101
+
+// 1(0)0 = 10
+// 1(0)1 = 11
+
+// 0 : right compute 
+// 1 : left compute
+
+
+// 1st Make Tree Binary
+// 2nd
+
+
+
+
+
+// //               0
+// //       0              0
+// //    0      0       0     0
+// //  0  0   0   0   0  0  0  0
+// 000   001 010 011  100 101
+
+
+// RipeMd 160 + position 
+// User provides the proof
+// Pass a dummy proof in between for not existing node
