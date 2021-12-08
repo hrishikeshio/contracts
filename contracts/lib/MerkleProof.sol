@@ -7,10 +7,10 @@ import "hardhat/console.sol";
  */
 library MerkleProof {
 
-    function verifyMultiple(bytes32[][] memory proofs, bytes32 root, bytes32 [] memory leaves, uint32[] memory assetId, uint32 depth) internal view returns (bool) {
+    function verifyMultiple(bytes32[][] memory proofs, bytes32 root, bytes32 [] memory leaves, uint32[] memory assetId, uint32 depth, uint32 maxAssets) internal view returns (bool) {
          for (uint256 i =0; i< proofs.length; i++)
          {
-             if(!verify(proofs[i], root, leaves[i], assetId[i], depth)) return false;
+             if(!verify(proofs[i], root, leaves[i], assetId[i], depth, maxAssets)) return false;
              //console.log('passed for', i+1);
          }
          return true;
@@ -22,17 +22,19 @@ library MerkleProof {
      * sibling hashes on the branch from the leaf to the root of the tree. Each
      * pair of leaves and each pair of pre-images are assumed to be sorted.
      */
-    function verify(bytes32[] memory proof, bytes32 root, bytes32 leaf, uint32 assetId, uint32 depth) internal view returns (bool) {
+    function verify(bytes32[] memory proof, bytes32 root, bytes32 leaf, uint32 assetId, uint32 depth, uint32 max_assets) internal view returns (bool) {
         bytes32 computedHash = leaf;
         bytes memory seq = bytes(getSequence(assetId, depth));
         //console.log(string(seq));
         uint256 j = depth;
+        uint256 last_node = max_assets;
+        uint256 my_node = assetId;
         for (uint256 i = 0; i < proof.length; i++) {
             bytes32 proofElement = proof[i];
             //console.logBytes1(seq[depth - i - 1]);
             //console.logBytes32(proofElement);
             j--;
-            if(proofElement != 0x0) {
+            if(last_node%2!=1 && last_node!=my_node) {
                 if (seq[j] == 0x30) {
                     //console.log('Hash(current computed hash + current element of the proof)');
                     computedHash = keccak256(abi.encodePacked(computedHash, proofElement));
@@ -41,6 +43,8 @@ library MerkleProof {
                     computedHash = keccak256(abi.encodePacked(proofElement, computedHash));
                 }
             }
+          my_node = my_node/2 + my_node%2 ;
+          last_node= last_node/2 + last_node%2 ;
         }
 
         // Check if the computed hash (root) is equal to the provided root

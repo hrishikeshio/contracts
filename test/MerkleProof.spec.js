@@ -47,7 +47,7 @@ function getProofPath(assetId, excludeParent, compact) {
     if (index === currentLevelCount - 1 && currentLevelCount % 2 === 1) {
       index = Math.floor(index / 2);
       //0xccd4ae6ef6fa5c628d5b3e95d10589f3cbb4e21e9f997aeda1c7403b267bac1a
-      compactProofPath.push('0x0000000000000000000000000000000000000000000000000000000000000000');
+      //compactProofPath.push('0x0000000000000000000000000000000000000000000000000000000000000000');
       // eslint-disable-next-line no-continue
       continue;
     }
@@ -147,7 +147,7 @@ describe('MerkleProof', function () {
         assetIds.push(j + 1);
       }
       //console.log(proofs, leaves, assetIds);
-      console.log(await MerkleProof.verifyMultiple(proofs, tree[0][0], leaves, assetIds, depth));
+      console.log(await MerkleProof.verifyMultiple(proofs, tree[0][0], leaves, assetIds, depth, i));
     }
   });
 });
