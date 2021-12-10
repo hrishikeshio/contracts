@@ -11,7 +11,6 @@ library MerkleProof {
          for (uint256 i =0; i< proofs.length; i++)
          {
              if(!verify(proofs[i], root, leaves[i], assetId[i], depth, maxAssets)) return false;
-             ////console.log('passed for', i+1);
          }
          return true;
     }
